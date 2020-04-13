@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Portal | Droupotal</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="img/icon.png">
+    <link rel="stylesheet" href="css/leaflet.css" />
+    <script src="js/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+        <script src="data/schools.geojson"></script>
+        <script src="data/rivers.geojson"></script>
+        <script src="data/constituencies.geojson"></script>
+</head>
+
+<style>
+    #mapid {
+        height: 450px;
+        width: 100%;
+    }
+</style>
+
+<body>
+    <!--start of navigation bar-->
+    <div class="navigation" id="navbar">
+
+        <nav>
+            <img src="img/logo.png" alt="">
+            <ul>
+
+                <li><a href="Index.html">Home</a></li>
+
+                <li><a href="portal.html">Portal</a></li>
+
+                <li><a href="portal2.html">Population</a></li>
+
+                <li><a href="about.html">About</a></li>
+
+                <li><a href="contact.html">Contact us</a></li>
+
+                <li><a href="login.html">Login</a></li>
+
+            </ul>
+
+        </nav>
+
+    </div>
+    <!--End of heading-->
+
+    <div id="mapid">
+
+
+
+    </div>
+
+    <footer>
+        <div class="footer">
+            <nav>
+                <ul>
+                    <li><a href="">Twitter</a></li>
+
+                    <li><a href="">Facebook</a></li>
+
+                    <li><a href="">Instagram</a></li>
+
+                    <li><a href="">Youtube</a></li>
+
+                    <li><a href="">LinkedIn</a></li>
+
+                    <li><a href="">Gitgub</a></li>
+                </ul>
+            </nav>
+            <center>
+                <h4>© 2019 Drouportal | Designedby:<a href="">MarxCode</a></h4>
+            </center>
+        </div>
+
+    </footer>
+
+    <script>
+       
+        var map = L.map('mapid').setView([-0.39999, 37.148198], 7);
+
+        var riversLayer = L.geoJson(rivers);
+
+        var schoolsLayer= L.geoJson(schools);
+
+        var tree = L.marker([-0.468287, 37.147522]).bindPopup('This is Denver, CO.');
+
+        var school = L.marker([-0.21286, 36.723175]).bindPopup('This is Denver, CO.');
+
+        var church = L.marker([-0.311736, 36.945648]).bindPopup('This is Denver, CO.');
+
+        var tea = L.marker([-0.417477, 37.754517]);
+
+        var hospital = L.marker([-0.433956, 36.298828]);
+
+        var constituenciesLayer = L.geoJson(constituencies);
+
+        var openStreet = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">Marcode|solutions</a> contributors'
+        });
+         var wmsLayers = L.tileLayer.wms("http://localhost:8081/geoserver/percel/wms?", {
+
+                layers: ["percel:land_parcel",], format: 'image/png',
+
+                // layers: ["workspace name:name of the data", "layer2", "layer3", "nyeri_agriculture", "towns", "nyeri_county_adm",], format: 'image/png',
+                transparent: true, visibility: false,
+            });
+        
+            // bike lanes
+            L.tileLayer('http://tiles.mapc.org/trailmap-onroad/{z}/{x}/{y}.png',
+                {
+                    maxZoom: 17,
+                    minZoom: 9
+                }).addTo(map); 
+        //var marker = L.marker([-0.39999, 37.148198]).bindPopup('Nyeri County').openPopup().addTo(map);
+        var lg_units= L.layerGroup([tree , school , church , tea , hospital]);
+        
+        var  ke_schools= L.layerGroup([ schoolsLayer]);
+        
+        var ke_constituencies = L.layerGroup([constituenciesLayer]);
+        
+        var riversLayer = L.layerGroup([riversLayer]);
+
+        var LandPLayer = L.layerGroup([wmsLayers]);
+
+        var base1 = L.layerGroup([openStreet]);
+        //basemaps
+        var overlays={
+            "Popular places " : lg_units
+            //"locations" :lg_locate
+        };
+        var baseLayers = {
+               // "Markers": markerLayer,
+                //"GeoJSON": geoLayer,
+                "Rivers": riversLayer,
+                "Schools": ke_schools,
+                "Constituencies": ke_constituencies,
+                "Land Parcels": LandPLayer,
+                "Open Street":base1
+
+        };
+        
+        L.control.layers(baseLayers, overlays).addTo(map);
+        // function onMapClick(e) {
+        //        alert("You clicked the map at " + e.latlng);
+        //    }
+        //
+        //    map.on('click', onMapClick);
+    </script>
+</body>
+
+</html>

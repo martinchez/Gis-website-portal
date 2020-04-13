@@ -1,0 +1,89 @@
+<html>
+
+<head>
+    <script src="https://cdn-webgl.eegeo.com/eegeojs/early_access/latest/eegeo.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="img/icon.png">
+    
+    
+</head>
+
+<body>
+    <div class="navigation" id="navbar">
+    
+        <nav>
+            <img src="img/logo.png" alt="">
+            <ul>
+    
+                <li><a href="Index.html">Home</a></li>
+    
+                <li><a href="portal.html">Portal</a></li>
+    
+                <li><a href="trial.html">3D View</a></li>
+    
+                <li><a href="about.html">About</a></li>
+    
+                <li><a href="contact.html">Contact us</a></li>
+    
+                <li><a href="login.html">Login</a></li>
+    
+            </ul>
+    
+        </nav>
+    
+    </div>
+    <!--End of heading-->
+    <div id="content" style="position: relative">
+        <div id="map" style="height: 400px"></div>
+    
+    
+    <footer>
+        <div class="footer">
+            <nav>
+                <ul>
+                    <li><a href="">Twitter</a></li>
+    
+                    <li><a href="">Facebook</a></li>
+    
+                    <li><a href="">Instagram</a></li>
+    
+                    <li><a href="">You-tube</a></li>
+    
+                    <li><a href="">LinkedIn</a></li>
+    
+                    <li><a href="">Github</a></li>
+                </ul>
+            </nav>
+            <center>
+                <h4>© 2019 Drouportal | Designedby:<a href="">MarxCode</a></h4>
+            </center>
+        </div>
+    
+    </footer>
+    
+
+
+
+        <script>
+            var map = L.eeGeo.map("map", "7ed2d3cb2f6e0b49038e1cf6cb18a22f", {
+                center: [37.7858, -122.401],
+                zoom: 12
+            });
+
+            var polygonPoints = [
+                    [37.786617, -122.404654],
+                    [37.797843, -122.407057],
+                    [37.798962, -122.398260],
+                    [37.794299, -122.395234]];
+            var poly = L.polygon(polygonPoints).addTo(map);
+            var marker = L.marker([37.7858, -122.401], { title: "My marker" }).addTo(map);
+
+
+             //<div id="content" style="position: relative">
+             //       <div id="map" style="height: 400px"></div>
+        </script>
+    </div>
+</body>
+
+</html>
