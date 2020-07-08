@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+    <title>Document</title>
+    <script src="data/schools.geojson"></script>
+    <script src="data/rivers.geojson"></script>
+    <script src="data/constituencies.geojson"></script>
+    <script
+        src="https://cdn.jsdelivr.net/gh/opencagedata/leaflet-opencage-search@1.3.0/dist/js/L.Control.OpenCageSearch.min.js">
+    </script>
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/opencagedata/leaflet-opencage-search@1.3.0/dist/css/L.Control.OpenCageData.Search.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+</head>
+<style>
+    #mapid {
+        height: 450px;
+        width: 100%;
+    }
+</style>
+
+<body>
+    <div id="export">
+        <li><a href="#" id="export">Export edits</a></li>
+    <div id="mapid">
+
+    </div>
+
+    <script>
+        //getting your current location
+        navigator.geolocation.getCurrentPosition(function (location) {
+            var latlng = new L.LatLng(location.coords.latitude, location.coords.longitude);
+            //initializing the map and setting start location to latlng
+            var map = L.map('mapid').setView(latlng, 13)
+
+            var openStreet = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">Marcode|solutions</a> contributors'
+            }).addTo(map);
+
+
+            var marker = L.marker(latlng).bindPopup('Current Location').openPopup().addTo(map);
+            //end of initializing and getting current location
+
+            //geocodding through the search bar
+            var options = {
+                key: '4023a02ad5654b12be3443be042037ac',
+                limit: 10,
+                proximity: '51.52255, -0.10249' // favour results near here
+            };
+            var control = L.Control.openCageSearch(options).addTo(map);
+            //end of geocoding search bar
+
+
+            //loading geojson layers from the data folde
+            var riversLayers = L.geoJson(rivers)
+            var constituencies = L.geoJson(constituencies)
+
+
+            //adding other fixed points on the map
+            var tree = L.marker([-0.468287, 37.147522]).bindPopup('This is Denver, CO.');
+
+            var school = L.marker([-0.21286, 36.723175]).bindPopup('This is Denver, CO.');
+
+            var church = L.marker([-0.311736, 36.945648]).bindPopup('This is Denver, CO.');
+
+            var tea = L.marker([-0.417477, 37.754517]);
+
+            var hospital = L.marker([-0.433956, 36.298828]);
+
+
+            //adding the various basemaps
+            var SpinalMap = L.tileLayer(
+                'https://tile.thunderforest.com/mobile-atlas/{z}/{x}/{y}.png?apikey=bbf3a740c553483ea26a4960622d03b6', {
+                    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href = "http://creativecommons.org/licenses/by-sa/2.0/" > CC - BY - SA </a>, Imagery © <a  href = "https://mapbox.com" > Mapbox < /a>'
+                }).addTo(map);
+
+            var googlemaps = L.tileLayer('https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">Marcode|solutions</a> contributors'
+            }).addTo(map);
+            var googleSatellite = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">Marcode|solutions</a> contributors'
+            }).addTo(map);
+            var googleHybrid = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">Marcode|solutions</a> contributors'
+            }).addTo(map);
+
+
+            //adding layer controll functionalities to the above layer of points json and basemaps
+            var lg_units = L.layerGroup([tree, school, church, tea, hospital]);
+
+            var ke_riversLayers = L.layerGroup([riversLayers]);
+
+            var ke_constituencies = L.layerGroup([constituencies])
+
+            //adding layer group of the basemaps
+
+            var base1 = L.layerGroup([openStreet]);
+
+            var base2 = L.layerGroup([SpinalMap]);
+
+            var base3 = L.layerGroup([googlemaps])
+
+            var base4 = L.layerGroup([googleSatellite])
+
+            var base5 = L.layerGroup([googleHybrid])
+
+            //creating the names to appear on the layer control panel
+            var overlays = {
+                "popular areas": lg_units,
+                "Rivers": ke_riversLayers,
+                "constituencies": ke_constituencies
+            }
+
+            //creating controls for the base layers
+            var baseLayers = {
+
+                "Open Street": base1,
+                "Spinal Map": base5,
+                "google maps": base2,
+                "Satellite Image": base3,
+                "Google Hybrid": base4
+
+            };
+
+            //functionality for the basemaps
+            L.control.layers(baseLayers, overlays).addTo(map);
+
+            var featureGroup = L.featureGroup().addTo(map);
+
+            //adding draw functionalities
+
+            var drawControl = new L.Control.Draw({
+                edit: {
+                    featureGroup: featureGroup
+                }
+            }).addTo(map)
+
+            map.on('draw:created', function (e) {
+                //make each edit added to the existing layer
+                featureGroup.addLayer(e.layer);
+
+            });
+
+            //clear layer function
+
+            document.getElementById('delete').onclick = function (e) {
+                featureGroup.clearLayers();
+            }
+            //exporting edits
+             document.getElementById('export').onclick = function (e) {
+             // Extract GeoJson from featureGroup
+             var data = featureGroup.toGeoJSON();
+
+             // Stringify the GeoJson
+             var convertedData = 'text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
+
+             // Create export
+             document.getElementById('export').setAttribute('href', 'data:' + convertedData);
+             document.getElementById('export').setAttribute('download', 'data.geojson');
+             }
+
+
+        });
+    </script>
+</body>
+
+</html>
